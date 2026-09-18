@@ -1,0 +1,153 @@
+.entete {
+    background: #1e88e5;
+    color: #fff;
+    padding: 16px;
+    text-align: center;
+    border-radius: 8px;
+
+    margin: 20px;
+    margin-bottom: 30px;
+}
+
+.contenu-principal {
+  width: 100%;
+  max-width: 900px;
+  margin: 30px auto;
+
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.form-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.form-group input {
+  display: flex;
+  width: 250px;
+}
+
+.form-meteo {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items:center;
+}
+
+.form-group label {
+    width: 70px;
+}
+
+.section-recherche,
+.section-bulletin {
+    background: #ffffff;
+    border: 1px solid #d6e4f0;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
+
+    box-sizing: border-box;
+}
+
+.btn-submit {
+    background: #1e88e5;
+    color: #ffffff;
+
+    border: none;
+    border-radius: 8px;
+
+    padding: 12px 20px;
+
+    font-size: 1rem;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+
+    transition: background 0.3s, transform 0.3s;
+}
+
+.btn-submit:hover {
+    background: #1565c0;
+    transform: translateY(-2px);
+}
+
+.btn-submit:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+input:focus {
+    outline: none;
+
+    border-color: #1e88e5;
+
+    box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.20);
+}
+
+footer {
+    margin-top: 30px;
+    padding: 20px;
+
+    text-align: center;
+
+    color: #666666;
+    font-size: 0.9rem;
+
+    border-top: 1px solid #d6e4f0;
+}
+
+.section-bulletin {
+    background: #eaf6ff;
+}
+
+.resultat-ville {
+    color: #1565c0;
+    font-weight: bold;
+}
+
+.resultat-temperature {
+    color: #e65100;
+    font-weight: bold;
+}
+
+.resultat-vent {
+    color: #2e7d32;
+    font-weight: bold;
+}
+
+.resultat-pluie {
+    color: #1976d2;
+    font-weight: bold;
+}
+
+.resultat-neige {
+    color: #7e57c2;
+    font-weight: bold;
+}
+
+.resultat-orage {
+    color: #f9a825;
+    font-weight: bold;
+}
+
+.section-bulletin h2 {
+    border-bottom: 3px solid #1e88e5;
+    padding-bottom: 10px;
+}
+
+.site-footer {
+    margin-top: 30px;
+    padding: 20px;
+    text-align: center;
+    color: #607d8b;
+    font-size: 0.9rem;
+    border-top: 1px solid #d6e4f0;
+}

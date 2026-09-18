@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Météo-DuJour v2</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- EN-TÊTE -->
+    <header class="entete">
+
+        <h1>🌦️ Météo-DuJour v2</h1>
+
+        <p class="sous-titre">
+            Votre bulletin météo en quelques clics
+        </p>
+
+    </header>
+
+
+    <!-- CONTENU PRINCIPAL -->
+    <main class="contenu-principal">
+
+
+        <!-- SECTION RECHERCHE -->
+        <section class="section-recherche"
+                 id="section-recherche">
+
+            <h2>Rechercher la météo</h2>
+
+
+            <!-- FORMULAIRE -->
+            <form id="form-meteo"
+                  class="form-meteo">
+
+
+                <!-- CHAMP VILLE -->
+                <div class="form-group">
+
+                    <label for="ville">
+                        Ville :
+                    </label>
+
+                    <input
+                        id="ville"
+                        type="text"
+                        placeholder="Ex : Paris"
+                    >
+
+                </div>
+
+
+                <!-- CHAMP PAYS -->
+                <div class="form-group">
+
+                    <label for="pays">
+                        Pays :
+                    </label>
+
+                    <input
+                        id="pays"
+                        type="text"
+                        placeholder="Ex : France"
+                    >
+
+                </div>
+
+
+                <!-- BOUTON -->
+                <button
+                    type="submit"
+                    class="btn-submit"
+                >
+                    Afficher la météo
+                </button>
+
+            </form>
+
+        </section>
+
+
+        <!-- SECTION BULLETIN -->
+        <section
+            class="section-bulletin"
+            id="bulletin-section"
+        >
+
+            <h2>Bulletin de météo</h2>
+
+
+            <!-- ZONE DU RÉSULTAT -->
+            <div
+                id="bulletin-meteo"
+                class="bulletin-meteo"
+            >
+
+                <p class="placeholder">
+                    Les informations météo
+                    s'afficheront ici après
+                    validation du formulaire.
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- PIED DE PAGE -->
+    <footer class="site-footer">
+    <p>© 2026 – Météo-DuJour v2 – Créé par Jopie NLEMVO</p>
+    </footer>
+
+
+    <!-- JAVASCRIPT -->
+    <script src="script.js"></script>
+
+</body>
+
+</html>
