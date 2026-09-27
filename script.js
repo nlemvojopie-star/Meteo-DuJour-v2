@@ -3,6 +3,7 @@ const bulletinMeteo = document.getElementById("bulletin-meteo");
 
 const villeInput = document.getElementById("ville");
 const paysInput = document.getElementById("pays");
+const boutonPosition = document.getElementById("btn-position");
 
 let champsRechercheVides = false;
 
@@ -25,6 +26,218 @@ formulaire.addEventListener("submit", function (evenement) {
   rechercherMeteo();
 });
 
+boutonPosition.addEventListener("click", utiliserMaPosition);
+
+function utiliserMaPosition() {
+    if (!navigator.geolocation) {
+        bulletinMeteo.innerHTML = `
+            <p class="message-erreur">
+                ❌ La géolocalisation n'est pas disponible sur cet appareil.
+            </p>
+        `;
+
+        return;
+    }
+
+
+    boutonPosition.disabled = true;
+    boutonPosition.textContent = "⏳ Localisation en cours...";
+
+
+    bulletinMeteo.innerHTML = `
+        <p class="message-chargement">
+            📍 Recherche de votre position...
+        </p>
+    `;
+
+
+    navigator.geolocation.getCurrentPosition(
+        positionTrouvee,
+        erreurPosition,
+        {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 300000
+        }
+    );
+}
+
+
+async function positionTrouvee(position) {
+    const latitude = position.coords.latitude;
+    const longitude = position.coords.longitude;
+
+
+    try {
+        bulletinMeteo.innerHTML = `
+            <p class="message-chargement">
+                🌦️ Récupération de la météo locale...
+            </p>
+        `;
+
+
+        const paramsMeteo = new URLSearchParams({
+            latitude: latitude,
+            longitude: longitude,
+            timezone: "auto",
+            forecast_days: 5,
+
+            current: [
+                "temperature_2m",
+                "apparent_temperature",
+                "relative_humidity_2m",
+                "wind_speed_10m",
+                "rain",
+                "snowfall",
+                "weather_code"
+            ].join(","),
+
+            hourly: "temperature_2m",
+
+            daily: [
+                "weather_code",
+                "temperature_2m_max",
+                "temperature_2m_min",
+                "precipitation_sum",
+                "wind_speed_10m_max"
+            ].join(",")
+        });
+
+
+        const urlMeteo =
+            "https://api.open-meteo.com/v1/forecast?" +
+            paramsMeteo.toString();
+
+
+        const reponseMeteo = await fetch(urlMeteo);
+
+
+        if (!reponseMeteo.ok) {
+            throw new Error("Impossible de récupérer la météo locale.");
+        }
+
+
+        const donneesMeteo = await reponseMeteo.json();
+
+
+        const fuseauHoraire = donneesMeteo.timezone;
+
+const lieuActuel = await trouverNomDePosition(
+    latitude,
+    longitude
+);
+
+afficherBulletin(
+    lieuActuel.ville,
+    lieuActuel.pays,
+    latitude,
+    longitude,
+    fuseauHoraire,
+    donneesMeteo
+);
+    } catch (erreur) {
+        console.error(erreur);
+
+        bulletinMeteo.innerHTML = `
+            <p class="message-erreur">
+                ❌ Impossible de récupérer la météo de votre position.
+            </p>
+        `;
+
+    } finally {
+        reinitialiserBoutonPosition();
+    }
+}
+
+async function trouverNomDePosition(latitude, longitude) {
+    try {
+        const paramsLieu = new URLSearchParams({
+            lat: latitude,
+            lon: longitude,
+            format: "jsonv2",
+            zoom: 10,
+            addressdetails: 1,
+            "accept-language": "fr"
+        });
+
+        const urlLieu =
+            "https://nominatim.openstreetmap.org/reverse?" +
+            paramsLieu.toString();
+
+        const reponseLieu = await fetch(urlLieu, {
+            headers: {
+                "Accept-Language": "fr"
+            }
+        });
+
+        if (!reponseLieu.ok) {
+            throw new Error(
+                "Impossible de déterminer le nom de la ville."
+            );
+        }
+
+        const donneesLieu = await reponseLieu.json();
+        const adresse = donneesLieu.address || {};
+
+        const ville =
+            adresse.city ||
+            adresse.town ||
+            adresse.village ||
+            adresse.municipality ||
+            "Ma position";
+
+        const pays = adresse.country || "";
+
+        return {
+            ville: ville,
+            pays: pays
+        };
+
+    } catch (erreur) {
+        console.warn(
+            "Nom du lieu indisponible :",
+            erreur
+        );
+
+        return {
+            ville: "Ma position",
+            pays: ""
+        };
+    }
+}
+
+function erreurPosition(erreur) {
+    let message = "Impossible d'obtenir votre position.";
+
+
+    if (erreur.code === 1) {
+        message = "Vous avez refusé l'autorisation d'accéder à votre position.";
+    }
+
+    if (erreur.code === 2) {
+        message = "Votre position est actuellement indisponible.";
+    }
+
+    if (erreur.code === 3) {
+        message = "La recherche de votre position a pris trop de temps.";
+    }
+
+
+    bulletinMeteo.innerHTML = `
+        <p class="message-erreur">
+            ❌ ${message}
+        </p>
+    `;
+
+
+    reinitialiserBoutonPosition();
+}
+
+
+function reinitialiserBoutonPosition() {
+    boutonPosition.disabled = false;
+    boutonPosition.textContent = "📍 Utiliser ma position";
+}
 
 async function rechercherMeteo() {
     const villeSaisie = villeInput.value.trim();
@@ -163,6 +376,14 @@ async function rechercherMeteo() {
     }
 }
 
+function afficherTemperature(temperature) {
+    if (temperature === null || temperature === undefined) {
+        return "Indisponible";
+    }
+
+    return Math.round(temperature) + " °C";
+}
+
 
 function afficherBulletin(
     ville,
@@ -187,9 +408,14 @@ const indiceMatin = heures.indexOf(heureMatin);
 const indiceMidi = heures.indexOf(heureMidi);
 const indiceSoir = heures.indexOf(heureSoir);
 
-const temperatureMatin = temperatures[indiceMatin];
-const temperatureMidi = temperatures[indiceMidi];
-const temperatureSoir = temperatures[indiceSoir];
+const temperatureMatin =
+    indiceMatin !== -1 ? temperatures[indiceMatin] : null;
+
+const temperatureMidi =
+    indiceMidi !== -1 ? temperatures[indiceMidi] : null;
+
+const temperatureSoir =
+    indiceSoir !== -1 ? temperatures[indiceSoir] : null;
 
 const condition = obtenirConditionMeteo(actuel.weather_code);
 const previsionsHTML = creerPrevisions(quotidien);
@@ -199,8 +425,8 @@ const previsionsHTML = creerPrevisions(quotidien);
         <div class="carte-actuelle">
 
             <p class="resultat-ville">
-                📍 ${ville}, ${pays}
-            </p>
+    📍 ${ville}${pays ? ", " + pays : ""}
+</p>
 
             <p class="condition-meteo">
                 ${condition.icone} ${condition.texte}
@@ -223,30 +449,33 @@ const previsionsHTML = creerPrevisions(quotidien);
         <article class="carte-temperature">
             <p class="moment-journee">🌅 Matin</p>
             <p class="heure-journee">8 h</p>
+
             <p class="valeur-temperature">
-                ${Math.round(temperatureMatin)} °C
+                ${afficherTemperature(temperatureMatin)}
             </p>
         </article>
 
         <article class="carte-temperature">
             <p class="moment-journee">☀️ Midi</p>
             <p class="heure-journee">12 h</p>
+
             <p class="valeur-temperature">
-                ${Math.round(temperatureMidi)} °C
+                ${afficherTemperature(temperatureMidi)}
             </p>
         </article>
 
         <article class="carte-temperature">
             <p class="moment-journee">🌙 Soir</p>
             <p class="heure-journee">20 h</p>
+
             <p class="valeur-temperature">
-                ${Math.round(temperatureSoir)} °C
+                ${afficherTemperature(temperatureSoir)}
             </p>
         </article>
 
-        </div>
+    </div>
 
-        </div>
+</div>
 
             <p>
                 💧 Humidité : <strong>${actuel.relative_humidity_2m} %</strong>
